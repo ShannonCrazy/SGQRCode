@@ -21,11 +21,11 @@
     return _sessionPreset;
 }
 
-- (NSArray *)metadataObjectTypes {
-    if (!_metadataObjectTypes) {
-        _metadataObjectTypes = @[AVMetadataObjectTypeQRCode];
-    }
-    return _metadataObjectTypes;
-}
+//- (NSArray *)metadataObjectTypes {
+//    if (!_metadataObjectTypes) {
+//        _metadataObjectTypes = @[AVMetadataObjectTypeQRCode];
+//    }
+//    return _metadataObjectTypes;
+//}
 
 @end

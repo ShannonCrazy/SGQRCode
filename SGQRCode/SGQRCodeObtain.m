@@ -138,6 +138,7 @@
     AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
     // 1、捕获设备输入流
     AVCaptureDeviceInput *deviceInput = [AVCaptureDeviceInput deviceInputWithDevice:device error:nil];
+    
     // 2、捕获元数据输出流
     AVCaptureMetadataOutput *metadataOutput = [[AVCaptureMetadataOutput alloc] init];
     [metadataOutput setMetadataObjectsDelegate:self queue:dispatch_get_main_queue()];
@@ -150,21 +151,29 @@
     }
 
     // 3、设置会话采集率
-    self.captureSession.sessionPreset = configure.sessionPreset;
+    if ([self.captureSession canSetSessionPreset:configure.sessionPreset]) {
+        self.captureSession.sessionPreset = configure.sessionPreset;
+    }
     
     // 4(1)、添加捕获元数据输出流到会话对象
-    [_captureSession addOutput:metadataOutput];
+    if ([self.captureSession canAddOutput:metadataOutput]) {
+        [self.captureSession addOutput:metadataOutput];
+    }
     // 4(2)、添加捕获输出流到会话对象；构成识了别光线强弱
     if (configure.sampleBufferDelegate == YES) {
         AVCaptureVideoDataOutput *videoDataOutput = [[AVCaptureVideoDataOutput alloc] init];
         [videoDataOutput setSampleBufferDelegate:self queue:dispatch_get_main_queue()];
-        [_captureSession addOutput:videoDataOutput];
+        if ([self.captureSession canAddOutput:videoDataOutput]) {
+            [self.captureSession addOutput:videoDataOutput];
+        }
     }
     // 4(3)、添加捕获设备输入流到会话对象
-    [_captureSession addInput:deviceInput];
+    if ([self.captureSession canAddInput:deviceInput]) {
+        [self.captureSession addInput:deviceInput];
+    }
     
     // 5、设置数据输出类型，需要将数据输出添加到会话后，才能指定元数据类型，否则会报错
-    metadataOutput.metadataObjectTypes = configure.metadataObjectTypes;
+    metadataOutput.metadataObjectTypes = configure.metadataObjectTypes ? configure.metadataObjectTypes : metadataOutput.availableMetadataObjectTypes;
     
     // 6、预览图层
     AVCaptureVideoPreviewLayer *videoPreviewLayer = [AVCaptureVideoPreviewLayer layerWithSession:_captureSession];
